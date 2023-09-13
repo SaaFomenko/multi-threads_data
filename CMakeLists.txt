@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(multi-threads_data:)
+project(multi-threads_data)
 
 # set the C++ standard
 set(CMAKE_CXX_STANDARD 17)
