@@ -19,6 +19,11 @@ namespace my
 			~Data()
 			{}
 	}
+
+  void swap(Data& A, Data& B)
+  {
+    
+  }
 }
 
 int main()
