@@ -40,14 +40,19 @@ namespace my
   	{
 		int temp = 0;
 
-		A.mutex().lock();
+		//A.mutex().lock();
+		//B.mutex().lock();
+		std::lock(A.mutex(), B.mutex());
 		temp = A.get();
 		A.set(B.get());
-		A.mutex().unlock();
+		//A.mutex().unlock();
+		//B.mutex().unlock();
 
-		B.mutex().lock();
+		//B.mutex().lock();
 		B.set(temp);
-		B.mutex().unlock();
+		std::lock_guard<std::mutex> la(A.mutex(), std::adopt_lock);
+		std::lock_guard<std::mutex> lb(B.mutex(), std::adopt_lock);
+		//B.mutex().unlock();
   	}
 
   	void swap_scoped_lock(Data& A, Data& B)
@@ -87,15 +92,19 @@ int main()
 	std::cout << "B = " << B.get() << '\n';
 
 	auto start = std::chrono::steady_clock::now();
-	std::thread t(my::swap_lock, std::ref(A), std::ref(B)); // Best perfomance.
+	std::thread t1(my::swap_lock, std::ref(A), std::ref(B)); // Best perfomance.
+	std::thread t2(my::swap_lock, std::ref(A), std::ref(B)); // Best perfomance.
 	//std::thread t(my::swap_scoped_lock, std::ref(A), std::ref(B));
 	//std::thread t(my::swap_unique_lock, std::ref(A), std::ref(B));
-	if (t.joinable())
-		t.join();
+	if (t1.joinable())
+		t1.join();
+	if (t2.joinable())
+		t2.join();
 	auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
-	std::cout << "Swap A, B\n";
+	std::cout << "Thread N 1 swap A, B\n";
+	std::cout << "Thread N 2 swap A, B\n";
 	std::cout << "A = " << A.get() << '\n';
 	std::cout << "B = " << B.get() << "\n\n";
 
